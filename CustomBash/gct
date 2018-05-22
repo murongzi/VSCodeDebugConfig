@@ -1,0 +1,16 @@
+#!/bin/sh
+
+if [ -z "$1" ];then
+    read -p "请输入本次git提交的message:" Line
+else
+    Line=$1
+fi
+
+git pull
+
+if [ $? -ne 0 ];then
+    exit $?
+fi
+
+git add . && git commit -m "$Line" && git push
+

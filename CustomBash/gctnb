@@ -1,0 +1,58 @@
+#!/bin/sh
+
+#判断本地是否有未完成的提交
+#检查本地是否有未添加到版本控制的文件
+OutMes=`git ls-files --other --exclude-standard --directory`
+if [ -n "$OutMes" ];then
+    echo "本地有未添加到版本控制的文件，请先处理: run command: git status"
+    exit 1
+fi
+
+#检查是否有文件未添加至暂存区
+OutMes=`git diff --exit-code`
+if [ -n "$OutMes" ];then
+    echo "请先处理本地未add到暂存区的代码: run command: git status"
+    exit 1
+fi
+
+#检查是否有文件在暂存区，但是为push至origin端
+OutMes=`git diff --cached --exit-code`
+if [ -n "$OutMes" ];then
+    echo "请先处理已在暂存区，但未push到origin的本地代码: run command: git diff --cached"
+    exit 1
+fi
+
+#如果输入参数只提供了一个，那么默认从master拉去新的分支
+if [ -z "$1" -a -z "$2" ];then
+    read -p "请输入源分支名: " BluePrint
+    read -p "请输入新分支名: " newBranch
+elif [ -z "$BluePrint" -o -z "$newBranch" ]; then
+    BluePrint='master'
+    newBranch=$1
+else
+    BluePrint=$1
+    newBranch=$2
+fi
+
+#切换至的分支
+git checkout $BluePrint
+
+git pull
+
+#拉取本地分支
+git checkout -b $newBranch
+
+#拉取远端分支
+git push origin $newBranch
+
+#添加本地分支与远端分支的映射
+git branch --set-upstream-to=origin/$newBranch $newBranch
+
+git pull
+
+
+#删除远端源上的分支
+#git branch -d -r origin/<branchName>
+
+#删除本地分支
+#git branch -D <branchName>
