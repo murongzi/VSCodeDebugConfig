@@ -26,7 +26,7 @@ fi
 if [ -z "$1" -a -z "$2" ];then
     read -p "请输入源分支名: " BluePrint
     read -p "请输入新分支名: " newBranch
-elif [ -z "$BluePrint" -o -z "$newBranch" ]; then
+elif [ -z "$1" -o -z "$2" ]; then
     BluePrint='master'
     newBranch=$1
 else
